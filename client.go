@@ -28,11 +28,15 @@ type Client struct {
 }
 
 // NewClient returns a new Client instance given a redis connection option.
-func NewClient(r RedisConnOpt) *Client {
+func NewClient(r RedisConnOpt, opts ...string) *Client {
 	c, ok := r.MakeRedisClient().(redis.UniversalClient)
 	if !ok {
 		panic(fmt.Sprintf("asynq: unsupported RedisConnOpt type %T", r))
 	}
+	if opts != nil && len(opts) > 0 {
+		base.UpdateRDSPrefix(opts[0])
+	}
+
 	return &Client{broker: rdb.NewRDB(c)}
 }
 
